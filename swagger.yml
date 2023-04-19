@@ -1,0 +1,228 @@
+openapi: 3.0.0
+info:
+  title: Report Generator API
+  version: 1.0.0
+paths:
+  /reports:
+    get:
+      summary: get reports list
+      tags:
+      - reports
+      responses:
+        '200':
+          description: レポート一覧
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Reports'
+              
+    post:
+      summary: Create a new report
+      tags:
+      - reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                paragraphs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      content:
+                        type: string
+              required:
+                - title
+      responses:
+        '200':
+          description: レポート一覧
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  ttEdited:
+                    type: string
+                    format: date-time
+                  paragraphs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        content:
+                          type: string
+  /reports/{id}:
+    get:
+      summary: Get a report by ID
+      tags:
+      - reports
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: 特定のレポート
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+  /paragraph/{id}:
+    post:
+      summary: Create a new paragraph
+      tags:
+      - paragraphs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+              required:
+                - title
+      responses:
+        '200':
+          description: レポート一覧
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  lastEdited:
+                    type: string
+                    format: date-time
+                  paragraphs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        content:
+                          type: string
+    patch:
+      summary: Update a paragraph
+      tags:
+      - paragraphs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+              required:
+                - title
+      responses:
+        '200':
+          description: レポート一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Paragraph'
+    delete:
+      summary: Delete a paragraph
+      tags:
+      - paragraphs
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: No Content
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Report:
+      type: object
+      properties:
+        title:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        paragraphs:
+          $ref: '#/components/schemas/Paragraph'
+    Reports:
+      type: array
+      items:
+        $ref: '#/components/schemas/Report'
+    Paragraph:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        order_number:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
