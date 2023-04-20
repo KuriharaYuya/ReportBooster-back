@@ -33,6 +33,9 @@ jobs:
         with:
           ruby-version: 3.2.2
           bundler-cache: true
+      - name: add platform
+        run: |
+          bundle lock --add-platform x86_64-linux
 
       - name: Bundler and gem install
         run: |
