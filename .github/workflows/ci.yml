@@ -1,0 +1,53 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RAILS_ENV: test
+      DB_USER: root
+      DB_PASSWORD: ''
+      DB_HOST: 127.0.0.1
+    services:
+      mysql:
+        image: mysql:8.0.20
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_DATABASE: app_test
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd "mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+          bundler-cache: true
+
+      - name: Bundler and gem install
+        run: |
+          gem install bundler
+          bundle lock --add-platform x86_64-linux
+          bundle install --jobs 4 --retry 3 --path vendor/bundle
+
+
+      - name: Database create and migrate
+        run: |
+          bundle exec rails db:create RAILS_ENV=test
+          bundle exec rails db:migrate RAILS_ENV=test
+      - name: Run rubocop
+        run: bundle exec rubocop
+
+
+      - name: Run rspec
+        run: bundle exec rspec
