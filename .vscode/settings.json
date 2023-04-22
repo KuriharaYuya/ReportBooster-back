@@ -1,0 +1,16 @@
+{
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.stylelint": true,
+      "source.fixAll.eslint": true
+    },
+    "ruby.useBundler": false, //run non-lint commands with bundle exec
+    "ruby.useLanguageServer": true, // use the internal language server (see below)
+    "ruby.lint": {
+      "rubocop": {
+        "useBundler": false // run rubocop with bundle exec
+      }
+    },
+    "ruby.format": "rubocop" // use rubocop for formatting
+  }
+  
