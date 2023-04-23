@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.6.0",
+    "openapi-schema-validator": "^12.1.0"
+  }
+}

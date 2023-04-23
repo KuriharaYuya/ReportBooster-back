@@ -30,3 +30,8 @@
 /db/mysql_data
 /db/mysql_data
 /.env
+
+# Ignore node_modules
+node_modules/
+
+output_dir

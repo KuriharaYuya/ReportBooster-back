@@ -1,3 +1,4 @@
+# openapi-generator-cli generate -g ruby-on-rails -i swagger.yml -o ./output_dir -t ruby-on-rails-server
 openapi: 3.0.0
 info:
   title: Report Generator API
@@ -10,7 +11,7 @@ paths:
       - users
       responses:
         '200':
-          description: ユーザー一覧
+          description: ユーザーを作成
           content:
             application/json:
               schema:
@@ -22,6 +23,7 @@ paths:
       summary: Create a new session
       tags:
       - sessions
+      operationId: createSession
       security:
         - bearerAuth: []
       responses:
@@ -35,6 +37,7 @@ paths:
       summary: Delete a session
       tags:
       - sessions
+      operationId: deleteSession
       responses:
         '204':
           description: No Content
@@ -49,7 +52,6 @@ paths:
           content:
             application/json:
               schema:
-                type: object
                 $ref: '#/components/schemas/Reports'
               
     post:
@@ -117,18 +119,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Report'
-  /paragraph/{id}:
+  /paragraphs:
     post:
       summary: Create a new paragraph
       tags:
       - paragraphs
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       requestBody:
         required: true
         content:
@@ -137,33 +132,20 @@ paths:
               type: object
               properties:
                 title:
-                  type: string
+                  $ref: '#/components/schemas/Paragraph/properties/title'
                 content:
-                  type: string
+                  $ref: '#/components/schemas/Paragraph/properties/content'
               required:
                 - title
+                - content
       responses:
         '200':
-          description: レポート一覧
+          description: 段落を追加
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  title:
-                    type: string
-                  lastEdited:
-                    type: string
-                    format: date-time
-                  paragraphs:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        title:
-                          type: string
-                        content:
-                          type: string
+                $ref: '#/components/schemas/Paragraph'
+  /paragraphs/{id}:
     patch:
       summary: Update a paragraph
       tags:
