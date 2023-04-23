@@ -41,6 +41,9 @@ gem 'bootsnap', require: false
 # cognito
 gem 'aws-sdk-cognitoidentityprovider', '~> 1.3'
 
+# API
+gem 'active_model_serializers', '~> 0.10.13'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'committee'
