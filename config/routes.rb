@@ -21,6 +21,6 @@ Rails.application.routes.draw do
   add_openapi_route 'GET', '/reports/{id}', controller_name: 'reports', action_name: 'show'
   add_openapi_route 'POST', '/reports', controller_name: 'reports', action_name: 'create'
   add_openapi_route 'POST', '/sessions', controller_name: 'sessions', action_name: 'create'
-  add_openapi_route 'DELETE', '/sessions', controller_name: 'sessions', action_name: 'delete_session'
+  add_openapi_route 'DELETE', '/sessions/{user_id}', controller_name: 'sessions', action_name: 'destroy'
   add_openapi_route 'POST', '/users', controller_name: 'users', action_name: 'create'
 end

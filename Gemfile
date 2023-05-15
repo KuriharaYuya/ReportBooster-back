@@ -42,7 +42,7 @@ gem 'bootsnap', require: false
 gem 'aws-sdk-cognitoidentityprovider', '~> 1.3'
 
 # API
-gem 'active_model_serializers', '~> 0.10.13'
+gem 'jsonapi-serializer', '~> 2.2'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

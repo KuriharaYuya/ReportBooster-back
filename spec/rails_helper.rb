@@ -62,7 +62,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
   config.add_setting :committee_options
   config.committee_options = {
-    schema_path: Rails.root.join('swagger.yml').to_s,
+    schema_path: Rails.root.join('./swagger.yml').to_s,
     strict_reference_validation: true
   }
   include Committee::Rails::Test::Methods
