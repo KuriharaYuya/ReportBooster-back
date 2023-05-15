@@ -8,103 +8,102 @@ paths:
     post:
       summary: Create a new user
       tags:
-      - users
+        - users
+      description: uuidでサーバーに投げて、サーバーでデコード、cookieにuser_idとuser_nameを入れてレスポンス。従ってレスポンスにuuidは存在しない
+      requestBody:
+        description: Request body for adding a new user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProperties'
       responses:
-        '200':
+        '201':
           description: ユーザーを作成
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                allOf:
+                  - $ref: '#/components/schemas/UserResponseBase'
+      operationId: post-users
       security:
         - bearerAuth: []
   /sessions:
     post:
       summary: Create a new session
       tags:
-      - sessions
+        - sessions
+      requestBody:
+        description: 新しいユーザーを追加するためのリクエストボディ
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProperties'
       operationId: createSession
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: ユーザー一覧
+          description: ログイン完了
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserProperties'
+  /sessions/{user_id}:
     delete:
       summary: Delete a session
       tags:
-      - sessions
-      operationId: deleteSession
+        - sessions
+      operationId: destroySession  # destroySessionというoperationIdを使用する
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            additionalProperties: false
       responses:
         '204':
           description: No Content
   /reports:
     get:
-      summary: get reports list
+      summary: Get reports list
       tags:
-      - reports
+        - reports
       responses:
         '200':
           description: レポート一覧
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reports'
-              
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportProperties'
+                additionalProperties: false
     post:
       summary: Create a new report
       tags:
-      - reports
+        - reports
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                paragraphs:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      title:
-                        type: string
-                      content:
-                        type: string
-              required:
-                - title
+              $ref: '#/components/schemas/ReportProperties'
       responses:
         '200':
           description: レポート一覧
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  title:
-                    type: string
-                  ttEdited:
-                    type: string
-                    format: date-time
-                  paragraphs:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        title:
-                          type: string
-                        content:
-                          type: string
+                $ref: '#/components/schemas/ReportProperties'
   /reports/{id}:
     get:
       summary: Get a report by ID
       tags:
-      - reports
+        - reports
       parameters:
         - name: id
           in: path
@@ -112,18 +111,19 @@ paths:
           schema:
             type: string
             format: uuid
+            additionalProperties: false
       responses:
         '200':
           description: 特定のレポート
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Report'
+                $ref: '#/components/schemas/ReportProperties'
   /paragraphs:
     post:
       summary: Create a new paragraph
       tags:
-      - paragraphs
+        - paragraphs
       requestBody:
         required: true
         content:
@@ -131,25 +131,31 @@ paths:
             schema:
               type: object
               properties:
+                report_id:
+                  type: string
+                  format: uuid
+                  writeOnly: true
                 title:
-                  $ref: '#/components/schemas/Paragraph/properties/title'
+                  $ref: '#/components/schemas/ParagraphProperties/properties/title'
                 content:
-                  $ref: '#/components/schemas/Paragraph/properties/content'
+                  $ref: '#/components/schemas/ParagraphProperties/properties/content'
               required:
+                - report_id
                 - title
                 - content
+              additionalProperties: false
       responses:
         '200':
           description: 段落を追加
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Paragraph'
+                $ref: '#/components/schemas/ParagraphProperties'
   /paragraphs/{id}:
     patch:
       summary: Update a paragraph
       tags:
-      - paragraphs
+        - paragraphs
       parameters:
         - name: id
           in: path
@@ -157,6 +163,7 @@ paths:
           schema:
             type: string
             format: uuid
+            additionalProperties: false
       requestBody:
         required: true
         content:
@@ -170,17 +177,18 @@ paths:
                   type: string
               required:
                 - title
+              additionalProperties: false
       responses:
         '200':
           description: レポート一覧
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Paragraph'
+                $ref: '#/components/schemas/ParagraphProperties'
     delete:
       summary: Delete a paragraph
       tags:
-      - paragraphs
+        - paragraphs
       parameters:
         - name: id
           in: path
@@ -188,6 +196,7 @@ paths:
           schema:
             type: string
             format: uuid
+            additionalProperties: false
       responses:
         '204':
           description: No Content
@@ -198,13 +207,12 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-    User:
+    UserResponseBase:
       type: object
       properties:
         id:
           type: string
-        cognito_sub:
-          type: string
+          readOnly: true
         username:
           type: string
         email:
@@ -212,32 +220,53 @@ components:
         created_at:
           type: string
           format: date-time
+          readOnly: true
         updated_at:
           type: string
           format: date-time
-
-    Report:
+          readOnly: true
+      additionalProperties: false
+    UserProperties:
+      allOf:
+        - $ref: '#/components/schemas/UserResponseBase'
+        - type: object
+          properties:
+            cognito_sub:
+              type: string
+              format: uuid
+              writeOnly: true
+    ReportProperties:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          writeOnly: true
         title:
           type: string
         created_at:
           type: string
           format: date-time
+          readOnly: true
         updated_at:
           type: string
           format: date-time
+          readOnly: true
         paragraphs:
-          $ref: '#/components/schemas/Paragraph'
-    Reports:
-      type: array
-      items:
-        $ref: '#/components/schemas/Report'
-    Paragraph:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParagraphProperties'
+          additionalProperties: false
+    ParagraphProperties:
       type: object
       properties:
         id:
           type: string
+          readOnly: true
         title:
           type: string
         content:
@@ -247,6 +276,9 @@ components:
         created_at:
           type: string
           format: date-time
+          readOnly: true
         updated_at:
           type: string
           format: date-time
+          readOnly: true
+      additionalProperties: false

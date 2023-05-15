@@ -1,3 +1,4 @@
-class UserSerializer < ActiveModel::Serializer
-  attributes :id, :cognito_sub, :username, :email
+class UserSerializer
+  include JSONAPI::Serializer
+  attributes :id, :username, :email, :created_at, :updated_at
 end
